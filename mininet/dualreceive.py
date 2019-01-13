@@ -25,7 +25,7 @@ print_thresh = thresh_increment
 # since the previous call. If True, printed bytecounts are cumulative.
 PRINT_CUMULATIVE = True     
 
-f = open('tmp.txt', 'w')
+f = open('tmp1.txt', 'w')
 
 def listen():
     global portnum1, portnum2, count1, count2, starttime, print_thresh
@@ -47,7 +47,8 @@ def listen():
     cs2 = 0
     (cs2, address2) = ss2.accept()
 
-    print('accepted connections', file=stderr)
+    #print('accepted connections', file=stderr)
+    print('acceppted connections')
     f.write('accepted connections')
     f.flush()
 
@@ -65,10 +66,11 @@ def listen():
              try:
                  mesg = s.recv(2048)
              except Exception as e:
-                  print('error: {} ({})'.format(e.errno, e.strerror), file=stderr)
+                  e = e
+                  #print('error: {} ({})'.format(e.errno, e.strerror), file=stderr)
              c = len(mesg)
              if c == 0: 
-                 print('closing socket connected to {}'.format(address1 if s==cs1 else address2), file=stderr)
+                 #print('closing socket connected to {}'.format(address1 if s==cs1 else address2), file=stderr)
                  f.write('closing socket connected to {}'.format(address1 if s==cs1 else address2))
                  if s==cs1: sset.remove(cs1)
                  else: sset.remove(cs2)
@@ -76,12 +78,12 @@ def listen():
              if s == cs1:   count1 += c
              elif s == cs2: count2 += c
              else: 
-                print ("something is not right:", c)
+                #print ("something is not right:", c)
                 f.write("something is not right:{}".format(c))
              if halting: exit(0)
              if count1+count2 > print_thresh:
                  print_thresh += thresh_increment;
-                 print('dualreceive: data total is {}'.format(count1+count2), file=stderr)
+                 #print('dualreceive: data total is {}'.format(count1+count2), file=stderr)
                  f.write('dualreceive: data total is {}'.format(count1+count2))
     f.close()
         
@@ -90,10 +92,10 @@ def printstats():
     global count1, count2, prev1, prev2, interval, repeats, halting, starttime, statcount
     elapsed = time.time()-starttime
     if PRINT_CUMULATIVE:
-        print ('{}\t{}\t{}'.format(elapsed, count1, count2))
+        #print ('{}\t{}\t{}'.format(elapsed, count1, count2))
         f.write('{}\t{}\t{}'.format(elapsed, count1, count2))
     else:
-        print ('{}\t{}\t{}'.format(elapsed, count1-prev1, count2-prev2))
+        #print ('{}\t{}\t{}'.format(elapsed, count1-prev1, count2-prev2))
         f.write('{}\t{}\t{}'.format(elapsed, count1-prev1, count2-prev2))
     f.flush()
     if (count1,count2) == (prev1,prev2):    # quit when there's no change in stats
