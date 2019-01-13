@@ -116,19 +116,20 @@ def main():
         r.cmd('route add 10.0.{}.10 dev r-eth{}'.format(i,i))
     for h in [r, h1, h2, h3]: h.cmd('/usr/sbin/sshd')
 
-    #CLI( net)
+    
 
     h3.cmd('netcat -l 5433&')
     h3.cmd('netcat -l 5434&')
     h1.cmd('python3 randomtelnet.py 10.0.3.10 5433&')
     h2.cmd('python3 randomtelnet.py 10.0.3.10 5434&')
-    h3.cmd('python3 dualreceive.py&')
-    h1.cmd('netcat -l 2345&')
-    h1.cmd('python3 sender.py 10 10.0.3.10 5430 reno&')
-    h2.cmd('netcat -l 2345&')
-    h1.cmd('python3 sender.py 10 10.0.3.10 5431 cubic&')
-    h3.cmd('echo hello|netcat 10.0.1.10 2345&')
-    h3.cmd('echo hello|netcat 10.0.2.10 2345&')
+    CLI( net)
+    #h3.cmd('python3 dualreceive.py&')
+    #h1.cmd('netcat -l 2345&')
+    #h1.cmd('python3 sender.py 10 10.0.3.10 5430 reno&')
+    #h2.cmd('netcat -l 2345&')
+    #h1.cmd('python3 sender.py 10 10.0.3.10 5431 cubic&')
+    #h3.cmd('echo hello|netcat 10.0.1.10 2345&')
+    #h3.cmd('echo hello|netcat 10.0.2.10 2345&')
     net.stop()
 
 setLogLevel('info')
