@@ -17,6 +17,7 @@ DELAY='110ms'		# r--h3 link
 BottleneckBW=8
 BBR=False
 
+
 # reno-bbr parameters:
 if BBR:
     DELAY='40ms'	
@@ -31,6 +32,7 @@ from mininet.cli import CLI
 from mininet.link import TCLink
 from mininet.topo import Topo
 from mininet.log import setLogLevel, info
+import time
 
 h1addr = '10.0.1.2/24'
 h2addr = '10.0.2.2/24'
@@ -123,14 +125,13 @@ def main():
     h1.cmd('python3 randomtelnet.py 10.0.3.10 5433&')
     h2.cmd('python3 randomtelnet.py 10.0.3.10 5434&')
     #CLI( net)
-    h3.cmd('python3 dualreceive.py>>ttt.txt&')
+    h3.cmd('python3 dualreceive.py&')
+    time.sleep(0.1)
     #CLI(net)
-    h1.cmd('netcat -l 2345&')
-    h1.cmd('python3 sender.py 100 10.0.3.10 5430 reno&')
-    h2.cmd('netcat -l 2345&')
-    h2.cmd('python3 sender.py 100 10.0.3.10 5431 vegas&')
-    r.cmd('echo hello | netcat 10.0.1.10 2345&')
-    r.cmd('echo hello | netcat 10.0.2.10 2345&')
+    h1.cmd('netcat -l 2345&&python3 sender.py 100 10.0.3.10 5430 reno&')
+    h2.cmd('netcat -l 2345&&python3 sender.py 100 10.0.3.10 5431 vegas&')
+    r.cmd('echo hello | netcat 10.0.1.10 2345&&echo hello | netcat 10.0.2.10 2345&')
+    CLI(net)
     net.stop()
 
 setLogLevel('info')

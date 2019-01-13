@@ -48,8 +48,7 @@ def listen():
     (cs2, address2) = ss2.accept()
 
     #print('accepted connections', file=stderr)
-    print('acceppted connections')
-    f.write('accepted connections')
+    f.write('accepted connections\n')
     f.flush()
 
     count1 = count2 = 0
@@ -71,7 +70,7 @@ def listen():
              c = len(mesg)
              if c == 0: 
                  #print('closing socket connected to {}'.format(address1 if s==cs1 else address2), file=stderr)
-                 f.write('closing socket connected to {}'.format(address1 if s==cs1 else address2))
+                 f.write('closing socket connected to {}\n'.format(address1 if s==cs1 else address2))
                  if s==cs1: sset.remove(cs1)
                  else: sset.remove(cs2)
                  if sset == []: exit(0)     # exit when no more open sockets
@@ -79,12 +78,12 @@ def listen():
              elif s == cs2: count2 += c
              else: 
                 #print ("something is not right:", c)
-                f.write("something is not right:{}".format(c))
+                f.write("something is not right:{}\n".format(c))
              if halting: exit(0)
              if count1+count2 > print_thresh:
                  print_thresh += thresh_increment;
                  #print('dualreceive: data total is {}'.format(count1+count2), file=stderr)
-                 f.write('dualreceive: data total is {}'.format(count1+count2))
+                 f.write('dualreceive: data total is {}\n'.format(count1+count2))
     f.close()
         
 
@@ -93,10 +92,10 @@ def printstats():
     elapsed = time.time()-starttime
     if PRINT_CUMULATIVE:
         #print ('{}\t{}\t{}'.format(elapsed, count1, count2))
-        f.write('{}\t{}\t{}'.format(elapsed, count1, count2))
+        f.write('{}\t{}\t{}\n'.format(elapsed, count1, count2))
     else:
         #print ('{}\t{}\t{}'.format(elapsed, count1-prev1, count2-prev2))
-        f.write('{}\t{}\t{}'.format(elapsed, count1-prev1, count2-prev2))
+        f.write('{}\t{}\t{}\n'.format(elapsed, count1-prev1, count2-prev2))
     f.flush()
     if (count1,count2) == (prev1,prev2):    # quit when there's no change in stats
         if repeats >= 10:
