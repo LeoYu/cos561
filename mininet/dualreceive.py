@@ -6,7 +6,7 @@ import threading
 from select import *
 import time
 
-portnum1 = 5430		# h1 sends to this
+portnum1 = 5430     # h1 sends to this
 portnum2 = 5431
 count1 = 0
 count2 = 0
@@ -17,13 +17,15 @@ interval = 0.1
 halting = False
 # interval = 1
 starttime = 0
-statcount = 0	# number of times printstats has been called
-thresh_increment =  2000000	# in bytes
+statcount = 0   # number of times printstats has been called
+thresh_increment =  2000000 # in bytes
 print_thresh = thresh_increment
 # If the following is True, printstats() prints the number of bytes since the start. 
 # If the following is False, printstats() prints the number of bytes received
 # since the previous call. If True, printed bytecounts are cumulative.
-PRINT_CUMULATIVE = True		
+PRINT_CUMULATIVE = True     
+
+f = open('tmp.txt', 'w')
 
 def listen():
     global portnum1, portnum2, count1, count2, starttime, print_thresh
@@ -32,12 +34,13 @@ def listen():
     if len(argv) > 2:
         cong_algorithm = argv[2]
 
+
     ss1 = socket(AF_INET, SOCK_STREAM)
-    ss1.bind(('', portnum1))			# INADDR_ANY = ''
+    ss1.bind(('', portnum1))            # INADDR_ANY = ''
     ss1.listen(5)
 
     ss2 = socket(AF_INET, SOCK_STREAM)
-    ss2.bind(('', portnum2))			# INADDR_ANY = ''
+    ss2.bind(('', portnum2))            # INADDR_ANY = ''
     ss2.listen(5)
 
     (cs1, address1) = ss1.accept()
@@ -45,11 +48,13 @@ def listen():
     (cs2, address2) = ss2.accept()
 
     print('accepted connections', file=stderr)
+    f.write('accepted connections')
+    f.flush()
 
     count1 = count2 = 0
 
     starttime = time.time()
-    printstats()		# first call
+    printstats()        # first call
 
     sset = [cs1, cs2]
 
@@ -64,16 +69,21 @@ def listen():
              c = len(mesg)
              if c == 0: 
                  print('closing socket connected to {}'.format(address1 if s==cs1 else address2), file=stderr)
+                 f.write('closing socket connected to {}'.format(address1 if s==cs1 else address2))
                  if s==cs1: sset.remove(cs1)
                  else: sset.remove(cs2)
-                 if sset == []: exit(0)		# exit when no more open sockets
+                 if sset == []: exit(0)     # exit when no more open sockets
              if s == cs1:   count1 += c
              elif s == cs2: count2 += c
-             else: print ("something is not right:", c)
+             else: 
+                print ("something is not right:", c)
+                f.write("something is not right:{}".format(c))
              if halting: exit(0)
              if count1+count2 > print_thresh:
                  print_thresh += thresh_increment;
                  print('dualreceive: data total is {}'.format(count1+count2), file=stderr)
+                 f.write('dualreceive: data total is {}'.format(count1+count2))
+    f.close()
         
 
 def printstats():
@@ -81,9 +91,12 @@ def printstats():
     elapsed = time.time()-starttime
     if PRINT_CUMULATIVE:
         print ('{}\t{}\t{}'.format(elapsed, count1, count2))
+        f.write('{}\t{}\t{}'.format(elapsed, count1, count2))
     else:
         print ('{}\t{}\t{}'.format(elapsed, count1-prev1, count2-prev2))
-    if (count1,count2) == (prev1,prev2):	# quit when there's no change in stats
+        f.write('{}\t{}\t{}'.format(elapsed, count1-prev1, count2-prev2))
+    f.flush()
+    if (count1,count2) == (prev1,prev2):    # quit when there's no change in stats
         if repeats >= 10:
              halting=True
              exit(0)
