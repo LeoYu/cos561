@@ -6,15 +6,19 @@ from mininet.topo import Topo
 from mininet.log import setLogLevel, info
 from sys import argv
 import numpy as np
-import time
+import time,cmd,random
 
 m =0
+n =0
+density = 10
+lr = 0.0001
+fix_choice = -1
 
 class RTopo(Topo):
     #def __init__(self, **kwargs):
     #global r
     def build(self, **_opts):     # special names?
-        global m
+        global m, n
         topo_file = 'default.topo'
         if len(argv) > 1:
             topo_file = argv[1]
@@ -37,31 +41,17 @@ class RTopo(Topo):
             #self.addLink(dic[x], dic[y])
             self.addLink(dic[x], dic[y], bw = bw, delay = delay, queue = queue)
 
-        # defaultIP = '10.0.1.1/24'  # IP address for r0-eth1
-        # r  = self.addNode( 'r', cls=LinuxRouter) # , ip=defaultIP )
-        # h1 = self.addHost( 'h1', ip='10.0.1.10/24', defaultRoute='via 10.0.1.1' )
-        # h2 = self.addHost( 'h2', ip='10.0.2.10/24', defaultRoute='via 10.0.2.1' )
-        # h3 = self.addHost( 'h3', ip='10.0.3.10/24', defaultRoute='via 10.0.3.1' )
-
-        # #  h1---80Mbit---r---8Mbit/100ms---h2
- 
-        # self.addLink( h1, r, intfName1 = 'h1-eth', intfName2 = 'r-eth1', bw=80,
-        #          params2 = {'ip' : '10.0.1.1/24'})
-
-        # self.addLink( h2, r, intfName1 = 'h2-eth', intfName2 = 'r-eth2', bw=80,
-        #          params2 = {'ip' : '10.0.2.1/24'})
-
-        # self.addLink( h3, r, intfName1 = 'h3-eth', intfName2 = 'r-eth3', 
-        #          params2 = {'ip' : '10.0.3.1/24'}, 
-        #          bw=BottleneckBW, delay=DELAY, queue=QUEUE)     # apparently queue is IGNORED here.
-
-# delay is the ONE-WAY delay, and is applied only to traffic departing h3-eth.
-
-# BBW=8: 1 KB/ms, for 1K packets; 110 KB in transit
-# BBW=10: 1.25 KB/ms, or 50 KB in transit if the delay is 40 ms.
-# queue = 267: extra 400 KB in transit, or 8x bandwidthxdelay
 
 def main():
+    global lr, density,fix_choice
+    if len(argv) >3:
+        density = argv[3]
+    if len(argv) > 4:
+        fix_choice = int(argv[4])
+    if len(argv) > 5:
+        lr = argv[5]
+    log = 'lr'+ str(lr) + 'alg' + str(fix_choice)+'.log'
+
     rtopo = RTopo()
     net = Mininet(topo = rtopo,
                    link=TCLink,
@@ -76,19 +66,54 @@ def main():
     c = RemoteController( 'c', ip='127.0.0.1', port=6633 )
     net.addController(c)
 
-    net.start()
-    CLI(net)
-    hosts =[] 
-    for i in range(2,4):
-        hosts.append('h'+str(i))
-    portnum = range(5000+2,5000+4)
-    schedule = np.array(range(2,4))+ time.time() #time 
+    K = 3
+    f = open(log, 'w')
+    for i in range(K):
+        f.write('0\n')
+    f.write('@')
+    f.close()
+    request_file = "default.req"
+    if len(argv)> 2:
+        request_file = argv[2]
+    f = open(request_file,'r')
+    num = int(f.readline())
+    cmd.Cmd('sudo rm sender.txt')
+    for i in range(1,n+1):
+        cmd.Cmd('sudo rm h{}.txt'.format(i))
 
-    #print(type(net['h1']))
-    for t in range(0,2):
-        net[hosts[t]].cmd('python2 receive.py {} {} 2>&1>>{}.txt &'.format(portnum[t], schedule[t], hosts[t]))
-        net['h1'].cmd('python2 send.py {} {} {} {} {} 2>&1 >>sender.txt&'.format(100,net[hosts[t]].IP(), portnum[t], schedule[t], 0.1))
-        print net[hosts[t]].IP()
+
+    net.start()
+
+    CLI(net)
+    random.seed(7)
+    for i in range(1,n+1):
+        for j in range(1,n+1):
+            if i!= j:
+                host1 = 'h'+str(i)
+                host2 = 'h'+ str(j)
+                net[host2].cmd('sudo python2 receive.py {} {} 2>&1>>{}.txt&'.format(4000+i, 0, 'noise'+host2))
+                net[host1].cmd('sudo python2 randomtraffic.py {} {} {} {} 2>&1 >> {}.txt&'.format(random.randint(1,100), net[host2].IP(), 4000+i, density, 'traffic'+host1))
+    time.sleep(4)
+
+    time0 = time.time()
+    for i in range(num):
+        starttime, host1, host2, portnum, packagesize = f.readline()[:-1].split()
+        starttime = float(starttime) + time0 
+        net[host2].cmd('sudo python2 receive.py {} {} 2>&1>>{}.txt &'.format(portnum, starttime, host2))
+        net[host1].cmd('sudo python2 send.py {} {} {} {} {} {} 2>&1 >>sender{}.txt&'.format(packagesize,net[host2].IP(), portnum, starttime, lr, fix_choice, fix_choice))
+    f.close()
+
+    # hosts =[] 
+    # for i in range(2,4):
+    #     hosts.append('h'+str(i))
+    # portnum = range(5000+2,5000+4)
+    # schedule = np.array(range(2,4))+ time.time() #time 
+
+    # #print(type(net['h1']))
+    # for t in range(0,2):
+    #     net[hosts[t]].cmd('python2 receive.py {} {} 2>&1>>{}.txt &'.format(portnum[t], schedule[t], hosts[t]))
+    #     net['h1'].cmd('python2 send.py {} {} {} {} {} 2>&1 >>sender.txt&'.format(100,net[hosts[t]].IP(), portnum[t], schedule[t], 0.1))
+    #     print net[hosts[t]].IP()
     CLI(net)
     net.stop()
 

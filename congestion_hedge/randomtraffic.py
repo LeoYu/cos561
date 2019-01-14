@@ -18,13 +18,13 @@ BottleneckBW = 10	# mbps
 # BottleneckBW = 0.2	# should yield mean spacing of 1.0 sec
 
 def talk():
-        if len(argv)>=1:
+        if len(argv)>1:
             seed = argv[1]
-        if len(argv)>=2:
+        if len(argv)>2:
             host = argv[2]
-        if len(argv)>=3:
+        if len(argv)>3:
             portnum = int(argv[3])
-        if len(argv) >= 4:
+        if len(argv) >4:
             multiplier = float(argv[4])
 
         random.seed(seed)
@@ -32,7 +32,7 @@ def talk():
 
         #global default_host, portnum, density, packetsize
         rhost = host
-        print("Looking up address of " + rhost + "...", end="")
+        print("Looking up address of " + rhost + "...")
         try:
             dest = gethostbyname(rhost)
         except gaierror as mesg:
@@ -42,6 +42,7 @@ def talk():
         print("got it: " + dest)
         addr=(dest, portnum)
         s = socket()
+        time.sleep(0.5)
         try:
             s.connect_ex(addr)
         except:
@@ -52,7 +53,7 @@ def talk():
 
         meanspacing = spacing(BottleneckBW, density)
 
-        rt = time.time()
+        rt = time.time() # delay 0.1s
         while True:
             rt = rt + rtime(meanspacing)
             time.sleep(max(0, rt - time.time()))

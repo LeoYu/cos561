@@ -2,10 +2,10 @@ from sys import argv
 import random
 N = 3
 Q = 10
-PL = 10000
-PR = 20000
-TL = 5
-TR = 10
+PL = 100
+PR = 500
+TL = 4
+TR = 6
 filename = 'default.req'
 random.seed(11)
 
@@ -18,6 +18,6 @@ t = 0
 for i in range(Q):
     h = random.randint(1, N - 1)
     port[h] = (port[h] + 1) % 100
-    t = t + random.randint(TL, TR)
+    t = t + random.uniform(TL, TR)
     file.write('{} h1 h{} {} {}\n'.format(t, h + 1, port[h] + 5400, random.randint(PL, PR)))
 file.close()

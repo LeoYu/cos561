@@ -15,7 +15,7 @@ def listen():
     sys.stdout.flush()
     ss = socket(AF_INET, SOCK_STREAM)
     ss.bind(('', portnum))            # INADDR_ANY = ''
-    #time.sleep(max(0,start_time - time.time()-1)) # wake up 0.5 sec before the scheduled time 
+    time.sleep(max(0,start_time - time.time()-1)) # wake up 0.5 sec before the scheduled time 
     ss.listen(5)
 
     (cs, address) = ss.accept()
