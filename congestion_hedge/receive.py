@@ -7,9 +7,8 @@ import time
 
 
 def listen():
-    rhost = argv[1]
-    portnum = int(argv[2])
-    start_time = int(argv[3])
+    portnum = int(argv[1])
+    start_time = float(argv[2])
 
 
     ss = socket(AF_INET, SOCK_STREAM)

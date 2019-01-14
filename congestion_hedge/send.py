@@ -16,7 +16,7 @@ def send():
 	if len(argv)>=3:
 		portnum = int(argv[3])
 	if len(argv)>=4:
-		start_time = float(argv[5])
+		start_time = float(argv[4])
 	if len(argv)>=5:
 		lr = float(argv[5])
 

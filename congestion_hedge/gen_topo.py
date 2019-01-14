@@ -1,8 +1,8 @@
 from sys import argv
 import random
-N = 2
-M = 1
-K = 0
+N = 3
+M = 3
+K = 3
 C = 1
 BWL = 4
 BWR = 8
