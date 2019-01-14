@@ -1,0 +1,13 @@
+3 3 6 100
+h1
+h2
+h3
+s1
+s2
+s3
+s3 s2 4 22ms
+s1 s2 4 43ms
+s2 s3 7 11ms
+h2 s3 80 5ms
+h3 s3 80 5ms
+h1 s1 80 5ms

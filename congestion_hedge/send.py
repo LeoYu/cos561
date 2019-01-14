@@ -3,14 +3,15 @@ from sys import argv
 import sys
 import numpy as np
 import time
-import fcntl
+import fcntl,socket
+import os
 
 cong_alg_map = {0: 'reno', 
 				1: 'cubic',
 				2: 'vegas'}
 def send():
 	if len(argv)>=1:
-		blockcount = argv[1]
+		blockcount = int(argv[1])
 	if len(argv)>=2:
 		host = argv[2]
 	if len(argv)>=3:
@@ -21,7 +22,7 @@ def send():
 		lr = float(argv[5])
 
 
-	#time.sleep(-time.time()+start_time)
+	time.sleep(max(0,-time.time()+start_time))
 	f =open('history.txt','r')
 	while True:
 		try:
@@ -50,44 +51,47 @@ def send():
 	cong_alg = cong_alg_map[choice]
 
 	print("Looking up address of " + host + "...")
-    try:
-        dest = socket.gethostbyname(host)
-    except socket.gaierror as mesg:
-        errno,errstr=mesg.args
-        print("\n   " + errstr);
-        return;
-    print("got it: " + dest)
-    addr=(dest, portnum)
-    s = socket.socket()
-    #IPPROTO_TCP = 6        	# defined in /usr/include/netinet/in.h
-    TCP_CONGESTION = 13 	# defined in /usr/include/netinet/tcp.h
-    cong = bytes(cong_alg, 'ascii')
-    try:
-       s.setsockopt(socket.IPPROTO_TCP, TCP_CONGESTION, cong)
-    except OSError as mesg:
-       errno, errstr = mesg.args
-       print ('congestion mechanism {} not available: {}'.format(cong_algorithm, errstr))
-       return
-    num_attepmt = 0
-    res=s.connect_ex(addr)
-    while res!=0 and num_attepmt <= 10: 
-        print "connect to port ", portnum, " failed"
-        time.sleep(0.1)
-        res=s.connect_ex(addr)
-       	num_attepmt = num_attepmt +1
-        return
+	sys.stdout.flush()
+	try:
+		dest = socket.gethostbyname(host)
+	except socket.gaierror as mesg:
+		errno,errstr=mesg.args
+		print("\n   " + errstr);
+		return;
+	print("got it: " + dest)
+	addr=(dest, portnum)
+	print addr
+	s = socket.socket()
+	print cong_alg
+	sys.stdout.flush()
+	#IPPROTO_TCP = 6        	# defined in /usr/include/netinet/in.h
+	TCP_CONGESTION = 13 	# defined in /usr/include/netinet/tcp.h
+	#cong = bytes(cong_alg, 'ascii')
+	cong = cong_alg
+	try:
+	   s.setsockopt(socket.IPPROTO_TCP, TCP_CONGESTION, cong)
+	except OSError as mesg:
+		errno, errstr = mesg.args
+		print ('congestion mechanism {} not available: {}'.format(cong_algorithm, errstr))
+		return
+	num_attepmt = 0
+	res=s.connect_ex(addr)
+	while res!=0 and num_attepmt <= 10: 
+		print "connect to port ", portnum, " failed"
+		time.sleep(0.1)
+		res=s.connect_ex(addr)
+		num_attepmt = num_attepmt +1
+		return
 
-    buf = bytearray(os.urandom(1000))
-    true_start_time = time.time()
-    for i in range(blockcount):
-        s.send(buf)
-    s.close()
-    duration = time.time()-true_start_time
-    throughput = blockcount*1.0/duration  # KB/s
-    print('total time: {} seconds'.format(duration))
+	buf = bytearray(os.urandom(1000))
+	true_start_time = time.time()
+	for i in range(blockcount):
+		s.send(buf)
+	s.close()
+	duration = time.time()-true_start_time
+	throughput = blockcount*1.0/duration  # KB/s
+	print('total time: {} seconds'.format(duration))
 
-
-	throughput = np.ones(3)
 	history[choice] = history[choice] + throughput/score[choice]
 
 	f = open('history.txt','w')

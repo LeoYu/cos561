@@ -34,8 +34,8 @@ class RTopo(Topo):
         for i in range(k):
             x, y, bw, delay = f.readline()[:-1].split()
             bw = int(bw)
-            self.addLink(dic[x], dic[y])
-            #self.addLink(dic[x], dic[y], bw = bw, delay = delay, queue = queue)
+            #self.addLink(dic[x], dic[y])
+            self.addLink(dic[x], dic[y], bw = bw, delay = delay, queue = queue)
 
         # defaultIP = '10.0.1.1/24'  # IP address for r0-eth1
         # r  = self.addNode( 'r', cls=LinuxRouter) # , ip=defaultIP )
@@ -64,7 +64,7 @@ class RTopo(Topo):
 def main():
     rtopo = RTopo()
     net = Mininet(topo = rtopo,
-                   #link=TCLink,
+                   link=TCLink,
                    switch = OVSKernelSwitch, 
                    controller = RemoteController,
           autoSetMacs = True   # --mac
@@ -79,16 +79,16 @@ def main():
     net.start()
     CLI(net)
     hosts =[] 
-    for i in range(2,8):
+    for i in range(2,4):
         hosts.append('h'+str(i))
-    portnum = range(5000+2,5000+8)
-    schedule = np.array(range(1,7))+ time.time() #time 
+    portnum = range(5000+2,5000+4)
+    schedule = np.array(range(2,4))+ time.time() #time 
 
-    print(type(net['h1']))
-    for t in range(0,6):
-        net[hosts[t]].cmd('python2 receive.py {} {}>>{}.txt&'.format(portnum[t], schedule[t], hosts[t]))
-        net['h1'].cmd('python2 send.py {} {} {} {}>>sender.txt&'.format(1000,net[hosts[t]].IP(), portnum[t], schedule[t], 0.1))
-
+    #print(type(net['h1']))
+    for t in range(0,2):
+        net[hosts[t]].cmd('python2 receive.py {} {} 2>&1>>{}.txt &'.format(portnum[t], schedule[t], hosts[t]))
+        net['h1'].cmd('python2 send.py {} {} {} {} {} 2>&1 >>sender.txt&'.format(100,net[hosts[t]].IP(), portnum[t], schedule[t], 0.1))
+        print net[hosts[t]].IP()
     CLI(net)
     net.stop()
 
