@@ -49,7 +49,7 @@ def main():
     if len(argv) > 4:
         fix_choice = int(argv[4])
     if len(argv) > 5:
-        lr = float(argv[5])
+        lr = argv[5]
     timestamp =  datetime.datetime.fromtimestamp(time.time()).strftime('_%H_%M_%S')
     log = 'lr'+ str(lr) + 'alg' + str(fix_choice)+ timestamp+ '.log'
 
@@ -92,16 +92,16 @@ def main():
             if i!= j:
                 host1 = 'h'+str(i)
                 host2 = 'h'+ str(j)
-                net[host2].cmd('sudo python2 ../receive.py {} {} 2>&1>>{}.txt&'.format(4000+i, 0, 'noise'+host2))
-                net[host1].cmd('sudo python2 ../randomtraffic.py {} {} {} {} 2>&1 >> {}.txt&'.format(random.randint(1,100), net[host2].IP(), 4000+i, density, 'traffic'+host1))
+                net[host2].cmd('sudo python2 receive.py {} {} 2>&1>>{}.txt&'.format(4000+i, 0, 'noise'+host2))
+                net[host1].cmd('sudo python2 randomtraffic.py {} {} {} {} 2>&1 >> {}.txt&'.format(random.randint(1,100), net[host2].IP(), 4000+i, density, 'traffic'+host1))
     time.sleep(4)
 
     time0 = time.time()
     for i in range(num):
         starttime, host1, host2, portnum, packagesize = f.readline()[:-1].split()
         starttime = float(starttime) + time0 
-        net[host2].cmd('sudo python2 ../receive.py {} {} 2>&1>>{}.txt &'.format(portnum, starttime, host2))
-        net[host1].cmd('sudo python2 ../send.py {} {} {} {} {} {} {} {} 2>&1 >>sender{}.txt&'.format(packagesize,net[host2].IP(), portnum, starttime, lr, lr*1000, fix_choice, log, fix_choice))
+        net[host2].cmd('sudo python2 receive.py {} {} 2>&1>>{}.txt &'.format(portnum, starttime, host2))
+        net[host1].cmd('sudo python2 send.py {} {} {} {} {} {} {} {} 2>&1 >>sender{}.txt&'.format(packagesize,net[host2].IP(), portnum, starttime, lr, lr*1000, fix_choice, log, fix_choice))
     f.close()
 
     # hosts =[] 
@@ -123,7 +123,7 @@ def main():
             time.sleep(0.5)
     net.stop()
 
-setLogLevel('debug')
+setLogLevel('info')
 main()
 
 """

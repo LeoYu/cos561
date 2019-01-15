@@ -1,7 +1,7 @@
 from sys import argv
 import random
 N = 3
-Q = 10
+Q = 100
 PL = 100
 PR = 500
 TL = 4

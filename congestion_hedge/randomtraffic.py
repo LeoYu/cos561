@@ -33,6 +33,7 @@ def talk():
         #global default_host, portnum, density, packetsize
         rhost = host
         print("Looking up address of " + rhost + "...")
+        flush()
         try:
             dest = gethostbyname(rhost)
         except gaierror as mesg:
@@ -40,6 +41,7 @@ def talk():
             print("\n   ", errstr);
             return;
         print("got it: " + dest)
+        flush()
         addr=(dest, portnum)
         s = socket()
         time.sleep(0.5)
@@ -47,6 +49,7 @@ def talk():
             s.connect_ex(addr)
         except:
             print("connect to port ", portnum, " failed")
+            flush()
             return
 
         buf = bytearray(os.urandom(packetsize))

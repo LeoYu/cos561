@@ -24,8 +24,13 @@ def send():
 	if len(argv)>5:
 		lr = float(argv[5])
 	if len(argv)>6:
-		fix_choice = int(argv[6])
-	log = 'lr'+ str(lr) + 'alg' + str(fix_choice)+'.log'
+		gamma = float(argv[6])
+	if len(argv)>7:
+		fix_choice = int(argv[7])
+	if len(argv)>8:
+		log = argv[8]
+
+	#log = 'lr'+ str(lr) + 'alg' + str(fix_choice)+'.log'
 
 	time.sleep(max(0,-time.time()+start_time))
 	f =open(log,'r')
@@ -50,7 +55,8 @@ def send():
 	score = score - np.min(score)
 	score = np.exp(lr*score)
 	score = score *1.0/ sum(score)
-	choice = int(np.random.choice(range(0,3), 1, p=score))
+	score = (1-gamma)*score + gamma* np.ones(len(cong_alg_map))/len(cong_alg_map)
+	choice = int(np.random.choice(range(0,len(cong_alg_map)), 1, p=score))
 	if fix_choice > -1:
 		choice = fix_choice
 	cong_alg = cong_alg_map[choice]
@@ -135,6 +141,8 @@ def send():
 	for x in average:
 		f.write(str(x)+' ')
 	f.write('\n')
+	g = open(str(len(accum))+'.kill','w')
+	g.close()
 	fcntl.flock(f, fcntl.LOCK_UN)
 	f.close()
 
