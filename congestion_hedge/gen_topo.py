@@ -2,7 +2,7 @@ from sys import argv
 import random
 N = 15
 M = 10
-K = 15
+K = 9
 C = 1
 BWL = 20
 BWR = 40
@@ -58,7 +58,7 @@ for i in range(K):
 
 for i in range(N):
     if i > 0:
-        file.write('h{} s{} {} {}ms\n'.format(i + C, random.randint(1, M), 80, 5))
+        file.write('h{} s{} {} {}ms\n'.format(i + C, random.randint(2, M), 80, 5))
 
 for i in range(C):
         file.write('h{} s{} {} {}ms\n'.format(i + 1, 1, 80, 5))
