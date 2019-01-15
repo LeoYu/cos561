@@ -1,13 +1,13 @@
 from sys import argv
 import random
-N = 3
-M = 3
-K = 3
+N = 15
+M = 10
+K = 15
 C = 1
-BWL = 4
-BWR = 8
+BWL = 20
+BWR = 40
 DL = 10
-DR = 50
+DR = 20
 filename = 'default.topo'
 random.seed(11)
 
@@ -29,14 +29,16 @@ for i in range(M):
 
 while True:
     f = range(M)
+    dic = {}
     edgex = []
     edgey = []
     for i in range(K):
         x = random.randint(0, M - 1)
         y = random.randint(0, M - 1)
-        while (x == y):
+        while (x == y or (x,y) in dic):
             x = random.randint(0, M - 1)
             y = random.randint(0, M - 1)
+        dic[(x,y)] = 1
         edgex.append(x)
         edgey.append(y)
         if x < y:

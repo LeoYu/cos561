@@ -89,7 +89,7 @@ def main():
     random.seed(7)
     for i in range(1,n+1):
         for j in range(1,n+1):
-            if i!= j:
+            if i!= j and random.random() > 0.9:
                 host1 = 'h'+str(i)
                 host2 = 'h'+ str(j)
                 net[host2].cmd('sudo python2 ../receive.py {} {} 2>&1>>{}.txt&'.format(4000+i, 0, 'noise'+host2))

@@ -1,9 +1,9 @@
 from sys import argv
 import random
-N = 3
+N = 10
 Q = 100
-PL = 100
-PR = 500
+PL = 400
+PR = 600
 TL = 4
 TR = 6
 filename = 'default.req'
