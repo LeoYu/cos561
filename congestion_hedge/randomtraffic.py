@@ -7,7 +7,7 @@ from sys import argv
 import os
 import time
 import threading
-import math
+import math,sys
 import random
 
 #default_host = "localhost"
@@ -48,9 +48,11 @@ def talk():
         try:
             s.connect_ex(addr)
         except:
-            print("connect to port ", portnum, " failed")
+            print "connect to port ", portnum," failed"
             sys.stdout.flush()
             return
+        print 'fds'
+        sys.stdout.flush()
 
         buf = bytearray(os.urandom(packetsize))
 
