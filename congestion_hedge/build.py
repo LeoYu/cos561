@@ -13,6 +13,7 @@ n =0
 density = 10
 lr = 0.0001
 fix_choice = -1
+max_thrpt = 1000
 
 class RTopo(Topo):
     #def __init__(self, **kwargs):
@@ -43,13 +44,15 @@ class RTopo(Topo):
 
 
 def main():
-    global lr, density,fix_choice
+    global lr, density,fix_choice,max_thrpt
     if len(argv) >3:
         density = argv[3]
     if len(argv) > 4:
         fix_choice = int(argv[4])
     if len(argv) > 5:
         lr = float(argv[5])
+    if len(argv) >6:
+        max_thrpt = float(argv[6])
     timestamp =  datetime.datetime.fromtimestamp(time.time()).strftime('_%H_%M_%S')
     log = 'lr'+ str(lr) + 'alg' + str(fix_choice)+ timestamp+ '.log'
 
@@ -101,7 +104,7 @@ def main():
         starttime, host1, host2, portnum, packagesize = f.readline()[:-1].split()
         starttime = float(starttime) + time0 
         net[host2].cmd('sudo python2 ../receive.py {} {} 2>&1>>{}.txt &'.format(portnum, starttime, host2))
-        net[host1].cmd('sudo python2 ../send.py {} {} {} {} {} {} {} {} 2>&1 >>sender{}.txt&'.format(packagesize,net[host2].IP(), portnum, starttime, lr, lr*1000, fix_choice, log, fix_choice))
+        net[host1].cmd('sudo python2 ../send.py {} {} {} {} {} {} {} {} 2>&1 >>sender{}.txt&'.format(packagesize,net[host2].IP(), portnum, starttime, lr, lr*max_thrpt, fix_choice, log, fix_choice))
     f.close()
 
     # hosts =[] 
