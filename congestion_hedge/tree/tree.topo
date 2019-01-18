@@ -1,0 +1,50 @@
+15 10 24 100
+h1
+h2
+h3
+h4
+h5
+h6
+h7
+h8
+h9
+h10
+h11
+h12
+h13
+h14
+h15
+s1
+s2
+s3
+s4
+s5
+s6
+s7
+s8
+s9
+s10
+s2 s4 21 20ms
+s7 s10 25 17ms
+s6 s3 34 17ms
+s5 s1 21 16ms
+s2 s3 30 12ms
+s8 s6 39 20ms
+s5 s9 40 12ms
+s2 s1 38 19ms
+s7 s6 31 12ms
+h2 s10 80 5ms
+h3 s4 80 5ms
+h4 s9 80 5ms
+h5 s7 80 5ms
+h6 s9 80 5ms
+h7 s5 80 5ms
+h8 s7 80 5ms
+h9 s3 80 5ms
+h10 s7 80 5ms
+h11 s6 80 5ms
+h12 s8 80 5ms
+h13 s8 80 5ms
+h14 s6 80 5ms
+h15 s9 80 5ms
+h1 s1 80 5ms
